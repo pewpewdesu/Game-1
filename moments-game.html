@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Autobiographical Point-and-Click Game</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        #game {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .scene {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .scene-text {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px 20px;
+            border-radius: 10px;
+            max-width: 70%;
+        }
+
+        .bg-1 {
+            background: url('images/childhood_home.jpg') center/cover no-repeat;
+        }
+
+        .bg-2 {
+            background: url('images/school.png') center/cover no-repeat;
+        }
+
+        .bg-3 {
+            background: url('images/garden.jpg') center/cover no-repeat;
+        }
+
+        .bg-4 {
+            background: url('images/cafe.png') center/cover no-repeat;
+        }
+
+        .bg-5 {
+            background: url('images/train.jpg') center/cover no-repeat;
+        }
+
+        .bg-6 {
+            background: url('images/studio.jpg') center/cover no-repeat;
+        }
+
+        .bg-7 {
+            background: url('images/rooftop.jpg') center/cover no-repeat;
+        }
+
+        .bg-8 {
+            background: url('images/library.png') center/cover no-repeat;
+        }
+
+        .bg-9 {
+            background: url('images/night_walk.gif') center/cover no-repeat;
+        }
+
+        .bg-10 {
+            background: url('images/college.jpg') center/cover no-repeat;
+        }
+
+        .hotspot {
+            position: absolute;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .hotspot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .hotspot-label {
+            display: none;
+            position: absolute;
+            bottom: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .hotspot:hover .hotspot-label {
+            display: block;
+        }
+
+        .next-btn,
+        .revisit-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+        }
+
+        #log {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px;
+            max-height: 30%;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+
+        .menu {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game"></div>
+    <div id="log"></div>
+
+    <script>
+        const scenes = [
+            {
+                id: 1, title: "Childhood Home", description: "Where it all began.",
+                hotspots: [
+                    { id: 'toy', x: '15%', y: '55%', w: '25%', h: '22%', title: 'Old Toy', text: 'You picked up a battered toy. It squeaks when you press it.', img: 'images/toy.jpg' },
+                ]
+            },
+            {
+                id: 2, title: "First School", description: "The first step toward learning.",
+                hotspots: [
+                    { id: 'desk', x: '15%', y: '50%', w: '25%', h: '22%', title: 'School Desk', text: 'A desk with carved initials.', img: 'images/desk.jpg' },
+                    { id: 'book', x: '60%', y: '30%', w: '25%', h: '22%', title: 'Textbook', text: 'Your first math textbook, worn from use.', img: 'images/textbook.gif' }
+                ]
+            },
+            {
+                id: 3, title: "Garden", description: "A peaceful place of reflection.",
+                hotspots: [
+                    { id: 'flower', x: '17%', y: '60%', w: '25%', h: '22%', title: 'Flower', text: 'A flower you used to water daily.', img: 'images/flower.gif' },
+                    { id: 'bench', x: '65%', y: '40%', w: '25%', h: '22%', title: 'Bench', text: 'The bench where you sat with friends.', img: 'images/bench.jpg' }
+                ]
+            },
+            {
+                id: 4, title: "Cafe", description: "Where new friendships began.",
+                hotspots: [
+                    { id: 'coffee', x: '20%', y: '55%', w: '25%', h: '22%', title: 'Coffee Cup', text: 'The first coffee you ordered alone.', img: 'images/coffee.jpg' },
+                ]
+            },
+            {
+                id: 5, title: "Train Station", description: "Journeys into the unknown.",
+                hotspots: [
+                    { id: 'ticket', x: '15%', y: '50%', w: '25%', h: '22%', title: 'Train Ticket', text: 'A ticket to your first solo trip.', img: 'images/ticket.png' },
+                    { id: 'clock', x: '65%', y: '20%', w: '25%', h: '22%', title: 'Station Clock', text: 'The clock you always checked nervously.', img: 'images/clock.jpg' }
+                ]
+            },
+            {
+                id: 6, title: "Music Room", description: "Where creativity thrived.",
+                hotspots: [
+                    { id: 'painting', x: '20%', y: '55%', w: '25%', h: '22%', title: 'Easel', text: 'An old easel covered in paint.', img: 'images/painting.jpg' },
+                    { id: 'cello', x: '65%', y: '25%', w: '25%', h: '22%', title: 'Cello', text: 'The cello you practiced for hours.', img: 'images/cello.jpg' }
+                ]
+            },
+            {
+                id: 7, title: "Rooftop", description: "Moments of clarity.",
+                hotspots: [
+                    { id: 'chair', x: '65%', y: '25%', w: '25%', h: '22%', title: 'Chair', text: 'A spot where you sat thinking.', img: 'images/bench.jpg' }
+                ]
+            },
+            {
+                id: 8, title: "Library", description: "Knowledge unlocked.",
+                hotspots: [
+                    { id: 'shelf', x: '12%', y: '55%', w: '25%', h: '22%', title: 'Bookshelf', text: 'A shelf stacked with classics.', img: 'images/bookshelf.jpeg' },
+                    { id: 'lamp', x: '65%', y: '25%', w: '25%', h: '22%', title: 'Reading Lamp', text: 'The lamp that lit your late-night studies.', img: 'images/lamp.jpg' }
+                ]
+            },
+            {
+                id: 9, title: "Night Walk", description: "Contemplating the path forward.",
+                hotspots: [
+                    { id: 'streetlight', x: '15%', y: '55%', w: '25%', h: '22%', title: 'Streetlight', text: 'The streetlight that guided your steps.', img: 'images/streetlight.jpg' },
+                    { id: 'cat', x: '65%', y: '25%', w: '25%', h: '22%', title: 'Stray Cat', text: 'A cat that accompanied you silently.', img: 'images/cat.png' }
+                ]
+            },
+            {
+                id: 10, title: "College", description: "The journey continues...",
+                hotspots: [
+                    { id: 'gate', x: '65%', y: '25%', w: '25%', h: '22%', title: 'Gate', text: 'The gate leading to your future.', img: 'images/gate.jpg' }
+                ]
+            }
+        ];
+
+        let currentScene = 0;
+        const logEl = document.getElementById('log');
+
+
+        function renderScene(index) {
+            const s = scenes[index];
+            let html = `<div class="scene bg-${s.id}">`;
+            html += `<div class="scene-text"><h2>${s.title}</h2><p>${s.description}</p></div>`;
+
+
+            s.hotspots.forEach(h => {
+                html += `
+                <button class="hotspot"
+                style="left:${h.x}; top:${h.y}; width:${h.w}; height:${h.h}"
+                onclick="showLog('${h.title}: ${h.text}')">
+                ${h.img ? `<img src="${h.img}" alt="${h.title}">` : ''}
+                <div class="hotspot-label">${h.title}</div>
+                </button>`;
+            });
+
+
+            if (index < scenes.length - 1) {
+                html += `<button class="next-btn" onclick="nextScene()">Next</button>`;
+            }
+
+
+            // Always show revisit menu once the end has been reached at least once
+            if (currentScene === scenes.length - 1) {
+                html += `<div class="menu">`;
+                scenes.forEach((sc, i) => {
+                    html += `<button class="revisit-btn" onclick="goToScene(${i})">${sc.title}</button>`;
+                });
+                html += `</div>`;
+            }
+
+
+            html += `</div>`;
+            document.getElementById('game').innerHTML = html;
+        }
+
+
+        function nextScene() {
+            currentScene++;
+            renderScene(currentScene);
+        }
+
+
+        function goToScene(i) {
+            currentScene = i;
+            renderScene(i);
+        }
+
+
+        function showLog(text) {
+            logEl.innerHTML += `<div>${text}</div>`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+
+        renderScene(currentScene);
+    </script>
+</body>
+
+</html>
